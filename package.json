@@ -1,0 +1,35 @@
+{
+  "name": "replitdb2",
+  "version": "0.0.0",
+  "description": "Improved and better replitdb-client.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "files": ["index.d.ts"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cursorweb/Replit-DB2.git"
+  },
+  "keywords": [
+    "Repl.it",
+    "Replit",
+    "Database",
+    "Replitdb",
+    "Repl.it-db",
+    "JavaScript"
+  ],
+  "author": "Coder100",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cursorweb/Replit-DB2/issues"
+  },
+  "homepage": "https://github.com/cursorweb/Replit-DB2#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "jest": "^27.0.4"
+  }
+}
