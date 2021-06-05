@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest"
   },
-  "files": ["index.d.ts"],
+  "files": [
+    "index.d.ts"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cursorweb/Replit-DB2.git"

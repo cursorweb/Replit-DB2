@@ -29,7 +29,7 @@ declare module "replitdb2" {
                 /** The default value to return if the key doeos not exist. Defaults to `null`. */
                 default?: any;
             }
-        ): Promise<any | Error>;
+        ): Promise<any | SyntaxError>;
 
         /**
          * Sets `key` to `value` in the database.
@@ -101,7 +101,7 @@ declare module "replitdb2" {
          * Sees if a key exists.
          * @param key The key.
          */
-        exists(key: string): Promise<boolean>;
+        keyExists(key: string): Promise<boolean>;
     }
 
     export = Client;
