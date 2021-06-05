@@ -1,44 +1,52 @@
 declare module "replitdb2" {
-    export default class Client {
+    class Client {
         /**
-         * If you have a custom replit DB URL, you can set it at `options.url`.
-         * 
-         * For development, you can see exactly what is being set by turning `options.debug` to `true`.
-         * 
-         * For local dev, you can custom set the file being written. Set `options.localFile`.
-         * 
          * @param options The options
          */
         constructor(options?: {
-            url?: string,
-            debug?: boolean,
-            localFile?: string
+            /** Custom replit DB URL */
+            url?: string;
+
+            /** Set to `true` to see exactly what the library is doing. */
+            debug?: boolean;
+
+            /** Customize the file data is being written to in local dev. Defaults to `database.json` */
+            localFile?: string;
         });
-        
+
         /**
          * Gets `key`.
-         * 
-         * If options.raw is set to true, it returns without parsing JSON.
-         * 
-         * If options.error is set to false, it does not error on failure, merely returning as raw.
-         * 
-         * If options.default is set, it will be returned if the key does not exist. Defaults to `null`
          * @param key The key
          * @param options The options
          */
-        get(key: string, options?: { raw: boolean, error?: boolean, default?: any }): Promise<any | Error>;
+        get(
+            key: string,
+            options?: {
+                /** Set to `true` to get the value without JSON parsing. */
+                raw?: boolean;
+                /** Set to `false` to silently fallback to raw value without throwing an error. */
+                error?: boolean;
+                /** The default value to return if the key doeos not exist. Defaults to `null`. */
+                default?: any;
+            }
+        ): Promise<any | Error>;
 
         /**
          * Sets `key` to `value` in the database.
-         * 
-         * If options.raw is set to true, it will set the value verbatim.
-         * 
-         * If options.overwrite is set to false, the key will not be ovewritten if it already exists.
          * @param key The key
          * @param value The value
          * @param options The options
          */
-        set(key: string, value: any, options?: { raw: boolean, overwrite?: boolean }): Promise<void>;
+        set(
+            key: string,
+            value: any,
+            options?: {
+                /** Set to `true` to set the value without `JSON.stringify` */
+                raw: boolean,
+                /** Set to `false` to not write to the key if it already exists. */
+                overwrite?: boolean
+            }
+        ): Promise<void>;
 
         /**
          * Deletes the key `key`.
@@ -51,7 +59,7 @@ declare module "replitdb2" {
          * @param prefix The prefix (optional)
          */
         list(prefix?: string): Promise<string[]>;
-        
+
 
         /**
          * Removes all the keys in the database.
@@ -65,14 +73,17 @@ declare module "replitdb2" {
 
         /**
          * Set the object to the database as `key`: `value`.
-         * 
-         * If options.ovewrite is set to true, the database will be only the object.
-         * Otherwise, the object is appended to the database.
-         * 
-         * If options.raw is set to true, all values will be set verbatim.
          * @param obj The object to set
          */
-        setAll(obj: Record<string, any>, options?: { overwrite: boolean, raw?: boolean }): Promise<void>;
+        setAll(
+            obj: Record<string, any>,
+            options?: {
+                /** Set to `true` to have the database be first wiped before setting the values. */
+                overwrite: boolean,
+                /** Set to `true` to set the values without `JSON.stringify`. */
+                raw?: boolean
+            }
+        ): Promise<void>;
 
         /**
          * Deletes all the given keys.
@@ -81,10 +92,17 @@ declare module "replitdb2" {
         deleteMultiple(...args: string[]): Promise<void>;
 
         /**
-         * Gets all the objects as an array:
-         * 
-         * [key, value]
+         * Gets all the keys and their respective values and zips as an array.
+         * @returns [key, value]
          */
         zipAll(): Promise<[string, any]>;
+
+        /**
+         * Sees if a key exists.
+         * @param key The key.
+         */
+        exists(key: string): Promise<boolean>;
     }
+
+    export = Client;
 }
