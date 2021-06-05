@@ -2,16 +2,14 @@ require("dotenv").config();
 const fs = require("fs").promises;
 const fetch = require("node-fetch");
 
-const DEFAULT_OPT = {
-    url: process.env.REPLIT_DB_URL,
-    debug: false,
-    localFile: "database.json"
-};
+const { CONST_OPT, GET_OPT } = require("./constants");
+
 
 // todo: add debug mode
+// todo: add local dev
 module.exports = class Client {
-    constructor(options = DEFAULT_OPT) {
-        this._config = Object.assign(DEFAULT_OPT, options);
+    constructor(options = CONST_OPT) {
+        this._config = Object.assign(CONST_OPT, options);
 
         if (
             (!this._config.url) || // it is most likely local dev (no replit db url)
@@ -19,20 +17,10 @@ module.exports = class Client {
         ) this._config.isLocal = true;
     }
 
-    async get(
-        key,
-        options = {
-            raw: false,
-            error: true,
-            default: null
-        }) {
+    async get(key, options = GET_OPT) {
         const url = this._config.url;
 
-        let opt = Object.assign({
-            raw: options.raw || false,
-            error: options.error || true,
-            default: options.default || null
-        });
+        let opt = Object.assign(GET_OPT, options);
 
         let result, text;
         result = text = await fetch(`${url}/${key}`).then(r => r.text());
