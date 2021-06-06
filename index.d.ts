@@ -42,7 +42,7 @@ declare module "replitdb2" {
             value: any,
             options?: {
                 /** Set to `true` to set the value without `JSON.stringify` */
-                raw: boolean,
+                raw?: boolean,
                 /** Set to `false` to not write to the key if it already exists. */
                 overwrite?: boolean
             }

@@ -8,5 +8,9 @@ module.exports = Object.freeze({
         raw: false,
         error: true,
         default: null
+    },
+    SET_OPT: {
+        raw: false,
+        overwrite: false
     }
 });

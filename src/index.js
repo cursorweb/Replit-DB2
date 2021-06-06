@@ -2,7 +2,7 @@ require("dotenv").config();
 const fs = require("fs").promises;
 const fetch = require("node-fetch");
 
-const { CONST_OPT, GET_OPT } = require("./constants");
+const { CONST_OPT, GET_OPT, SET_OPT } = require("./constants");
 
 
 // todo: add debug mode
@@ -38,5 +38,26 @@ module.exports = class Client {
         }
 
         return result;
+    }
+
+    async set(key, value, options = SET_OPT) {
+        // todo: overwrite
+        const url = this._config.url;
+
+        let opt = Object.assign(SET_OPT, options);
+        let val = opt.raw ? JSON.stringify(value) : value;
+
+        await fetch(`${url}/${value}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `${key}=${value}`
+        });
+    }
+
+    async delete(key) {
+        const url = this._config.url;
+        await fetch(`${url}/${key}`, { method: "DELETE" });
     }
 };
