@@ -63,8 +63,10 @@ declare module "replitdb2" {
 
         /**
          * Removes all the keys in the database.
+         * 
+         * @param prefix The prefix of the keys (optional)
          */
-        empty(): Promise<void>;
+        empty(prefix?: string): Promise<void>;
 
         /**
          * Gets the entire database and returns as an object.
@@ -111,6 +113,8 @@ declare module "replitdb2" {
          * @param query The string to search.
          */
         findKeys(query: string): Promise<string[]>;
+
+        // todo: type aliases
     }
 
     export = Client;

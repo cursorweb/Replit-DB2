@@ -74,4 +74,24 @@ module.exports = class Client {
         if (rawKeys == "") return [];
         else return rawKeys.split("\n").map(decodeKey);
     }
+
+
+    async empty(prefix = "") {
+        // promise.all offers more speed
+        let promises = [];
+
+        for (const key of await this.list(prefix)) {
+            promises.push(this.delete(key));
+        }
+
+        await Promise.all(promises);
+    }
+
+    
+
+
+    // Aliases
+    clear = this.empty;
+    all = this.list;
+    del = this.delete;
 };
