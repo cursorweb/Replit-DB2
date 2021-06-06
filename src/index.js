@@ -3,6 +3,7 @@ const fs = require("fs").promises;
 const fetch = require("node-fetch");
 
 const { CONST_OPT, GET_OPT, SET_OPT } = require("./constants");
+const { encodeKey, decodeKey } = require("./util");
 
 
 // todo: add debug mode
@@ -19,7 +20,7 @@ module.exports = class Client {
 
     async get(key, options = GET_OPT) {
         const url = this._config.url;
-        const k = encodeURIComponent(key);
+        const k = encodeKey(key);
 
         let opt = Object.assign(GET_OPT, options);
 
@@ -44,7 +45,7 @@ module.exports = class Client {
     async set(key, value, options = SET_OPT) {
         // todo: overwrite
         const url = this._config.url;
-        const k = encodeURIComponent(key);
+        const k = encodeKey(key);
         
         let opt = Object.assign(SET_OPT, options);
         let val = opt.raw ? JSON.stringify(value) : value;
@@ -60,17 +61,17 @@ module.exports = class Client {
 
     async delete(key) {
         const url = this._config.url;
-        const k = encodeURIComponent(key);
+        const k = encodeKey(key);
 
         await fetch(`${url}/${k}`, { method: "DELETE" });
     }
 
     async list(prefix = "") {
         const url = this._config.url;
-        const pfix = encodeURIComponent(prefix);
+        const pfix = encodeKey(prefix);
         const rawKeys = await fetch(`${url}?prefix=${pfix}`).then(r => r.text());
 
         if (rawKeys == "") return [];
-        else return rawKeys.split("\n").map(decodeURIComponent);
+        else return rawKeys.split("\n").map(decodeKey);
     }
 };

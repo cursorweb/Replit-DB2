@@ -1,2 +1,6 @@
+6/6/2021 0.3.6
+Major security fix with keys using newlines not being encoded correctly.
+Using JSON should fix most problems.
+
 6/5/2021 0.0.0
 Initial Release.
