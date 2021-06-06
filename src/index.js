@@ -19,11 +19,12 @@ module.exports = class Client {
 
     async get(key, options = GET_OPT) {
         const url = this._config.url;
+        const k = encodeURIComponent(key);
 
         let opt = Object.assign(GET_OPT, options);
 
         let result, text;
-        result = text = await fetch(`${url}/${key}`).then(r => r.text());
+        result = text = await fetch(`${url}/${k}`).then(r => r.text());
 
         if (!this._config.isLocal) {
             try {
@@ -43,21 +44,28 @@ module.exports = class Client {
     async set(key, value, options = SET_OPT) {
         // todo: overwrite
         const url = this._config.url;
-
+        const k = encodeURIComponent(key);
+        
         let opt = Object.assign(SET_OPT, options);
         let val = opt.raw ? JSON.stringify(value) : value;
 
-        await fetch(`${url}/${value}`, {
+        await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: `${key}=${value}`
+            body: `${k}=${val}`
         });
     }
 
     async delete(key) {
         const url = this._config.url;
-        await fetch(`${url}/${key}`, { method: "DELETE" });
+        const k = encodeURIComponent(key);
+
+        await fetch(`${url}/${k}`, { method: "DELETE" });
+    }
+
+    async list(prefix = "") {
+
     }
 };
