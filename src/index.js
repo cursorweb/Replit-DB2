@@ -66,6 +66,11 @@ module.exports = class Client {
     }
 
     async list(prefix = "") {
+        const url = this._config.url;
+        const pfix = encodeURIComponent(prefix);
+        const rawKeys = await fetch(`${url}?prefix=${pfix}`).then(r => r.text());
 
+        if (rawKeys == "") return [];
+        else return rawKeys.split("\n").map(decodeURIComponent);
     }
 };
