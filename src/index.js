@@ -34,7 +34,7 @@ module.exports = class Client {
                 // is raw
             } catch {
                 if (opt.error) throw new SyntaxError(
-                    `Failed to parse value of ${key}, try passing a raw option to get the raw value`
+                    `Failed to parse value of ${key}, try setting 'options.raw' to true.`
                 );
             }
         }
@@ -43,12 +43,21 @@ module.exports = class Client {
     }
 
     async set(key, value, options = SET_OPT) {
-        // todo: overwrite
+        let opt = Object.assign(SET_OPT, options);
+        if (opt.overwrite && await this.exists(key)) return;
+
         const url = this._config.url;
         const k = encodeKey(key);
 
-        let opt = Object.assign(SET_OPT, options);
-        let val = opt.raw ? JSON.stringify(value) : value;
+        let val;
+
+        try {
+            // in raw mode, we do not need to do .toString
+            // js handles this for us!
+            val = opt.raw ? JSON.stringify(value) : value;
+        } catch {
+            throw new TypeError(`Failed to set value of ${key}, try setting 'options.raw' to true.`);
+        }
 
         await fetch(url, {
             method: "POST",
@@ -87,13 +96,15 @@ module.exports = class Client {
         await Promise.all(promises);
     }
 
-    // todo: sync with .d.ts
     async getAll(options = GETALL_OPT) {
         let opt = Object.assign(GETALL_OPT, options);
 
         let output = [];
         for (const key of await this.list(prefix)) {
-            const value = await this.get(key);
+            const value = await this.get(key, {
+                raw: opt.raw,
+                error: opt.error
+            });
             output[key] = value;
         }
 
@@ -140,9 +151,9 @@ module.exports = class Client {
         let opt = Object.assign(FINDKEYS_OPT, options);
 
         return (await this.list()).filter(k =>
-        opt.caseSensitive
-            ? k.indexOf(query.toLowerCase()) > -1
-            : k.toLowerCase().indexOf(query.toLowerCase()) > -1
+            opt.caseSensitive
+                ? k.indexOf(query.toLowerCase()) > -1
+                : k.toLowerCase().indexOf(query.toLowerCase()) > -1
         );
     }
 

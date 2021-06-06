@@ -11,7 +11,7 @@ module.exports = Object.freeze({
     },
     SET_OPT: {
         raw: false,
-        overwrite: false
+        overwrite: true
     },
     GETALL_OPT: {
         prefix: "",
