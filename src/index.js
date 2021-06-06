@@ -122,7 +122,7 @@ module.exports = class Client {
         await Promise.all(promises);
     }
 
-    zipAll() {
+    async zipAll() {
         let output = [];
 
         for (const key of await this.list()) {
@@ -132,11 +132,11 @@ module.exports = class Client {
         return output;
     }
 
-    keyExists(key) {
+    async keyExists(key) {
         return !!(await this.get(key, { raw: true }));
     }
 
-    findKeys(query, options) {
+    async findKeys(query, options) {
         let opt = Object.assign(FINDKEYS_OPT, options);
 
         return (await this.list()).filter(k =>
