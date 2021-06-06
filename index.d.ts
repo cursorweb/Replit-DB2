@@ -102,6 +102,15 @@ declare module "replitdb2" {
          * @param key The key.
          */
         keyExists(key: string): Promise<boolean>;
+
+        /**
+         * Finds a key
+         * 
+         * The string can be anywhere, not just at the start compared to `list`.
+         * 
+         * @param query The string to search.
+         */
+        findKeys(query: string): Promise<string[]>;
     }
 
     export = Client;
