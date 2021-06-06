@@ -12,5 +12,13 @@ module.exports = Object.freeze({
     SET_OPT: {
         raw: false,
         overwrite: false
+    },
+    GETALL_OPT: {
+        prefix: "",
+        raw: false,
+        error: true
+    },
+    FINDKEYS_OPT: {
+        caseSensitive: false
     }
 });

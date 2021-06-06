@@ -1,4 +1,5 @@
 declare module "replitdb2" {
+    // todo: make options less repetitive
     class Client {
         /**
          * @param options The options
@@ -42,9 +43,9 @@ declare module "replitdb2" {
             value: any,
             options?: {
                 /** Set to `true` to set the value without `JSON.stringify` */
-                raw?: boolean,
+                raw?: boolean;
                 /** Set to `false` to not write to the key if it already exists. */
-                overwrite?: boolean
+                overwrite?: boolean;
             }
         ): Promise<void>;
 
@@ -70,8 +71,19 @@ declare module "replitdb2" {
 
         /**
          * Gets the entire database and returns as an object.
+         * 
+         * @param options The options to configure (optional)
          */
-        getAll(): Promise<Record<string, any>>;
+        getAll(
+            options?: {
+                /** Filter by the prefix of the keys. */
+                prefix?: string;
+                /** Set to `true` to have all values be text. */
+                raw?: string;
+                /** Set to `true` to silently convert to raw value if the value is not valid JSON. */
+                error?: string;
+            }
+        ): Promise<Record<string, any>>;
 
         /**
          * Set the object to the database as `key`: `value`.
@@ -81,23 +93,26 @@ declare module "replitdb2" {
             obj: Record<string, any>,
             options?: {
                 /** Set to `true` to have the database be first wiped before setting the values. */
-                overwrite: boolean,
+                overwrite: boolean;
                 /** Set to `true` to set the values without `JSON.stringify`. */
-                raw?: boolean
+                raw?: boolean;
             }
         ): Promise<void>;
 
         /**
          * Deletes all the given keys.
-         * @param args The keys to delete.
+         * @param keys The keys to delete.
          */
-        deleteMultiple(...args: string[]): Promise<void>;
+        deleteMultiple(...keys: string[]): Promise<void>;
 
         /**
          * Gets all the keys and their respective values and zips as an array.
+         * 
+         * @param prefix The prefix of the key (optional)
+         * 
          * @returns [key, value]
          */
-        zipAll(): Promise<[string, any]>;
+        zipAll(options?: string): Promise<[string, any]>;
 
         /**
          * Sees if a key exists.
@@ -111,8 +126,15 @@ declare module "replitdb2" {
          * The string can be anywhere, not just at the start compared to `list`.
          * 
          * @param query The string to search.
+         * @param options The options to configure (optional).
          */
-        findKeys(query: string): Promise<string[]>;
+        findKeys(
+            query: string,
+            options?: {
+                /** Set to `true` to match keys with correct case as well. Defaults to `false`. */
+                caseSensitive: boolean
+            }
+        ): Promise<string[]>;
 
         // todo: type aliases
     }

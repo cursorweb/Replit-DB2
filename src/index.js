@@ -2,7 +2,7 @@ require("dotenv").config();
 const fs = require("fs").promises;
 const fetch = require("node-fetch");
 
-const { CONST_OPT, GET_OPT, SET_OPT } = require("./constants");
+const { CONST_OPT, GET_OPT, SET_OPT, GETALL_OPT, SETALL_OPT, FINDKEYS_OPT } = require("./constants");
 const { encodeKey, decodeKey } = require("./util");
 
 
@@ -46,7 +46,7 @@ module.exports = class Client {
         // todo: overwrite
         const url = this._config.url;
         const k = encodeKey(key);
-        
+
         let opt = Object.assign(SET_OPT, options);
         let val = opt.raw ? JSON.stringify(value) : value;
 
@@ -87,11 +87,70 @@ module.exports = class Client {
         await Promise.all(promises);
     }
 
-    
+    // todo: sync with .d.ts
+    async getAll(options = GETALL_OPT) {
+        let opt = Object.assign(GETALL_OPT, options);
+
+        let output = [];
+        for (const key of await this.list(prefix)) {
+            const value = await this.get(key);
+            output[key] = value;
+        }
+
+        return output;
+    }
+
+    async setAll(obj, options) {
+        let opt = Object.assign(SET_OPT, options);
+        let promises = [];
+
+        for (const key in obj) {
+            let val = obj[key];
+            promises.push(this.set(key, val, opt));
+        }
+
+        await Promise.all(promises);
+    }
+
+    async deleteMultiple(...keys) {
+        let promises = [];
+
+        for (const key of keys) {
+            promises.push(this.delete(key));
+        }
+
+        await Promise.all(promises);
+    }
+
+    zipAll() {
+        let output = [];
+
+        for (const key of await this.list()) {
+            output.push([key, await this.get(key)]);
+        }
+
+        return output;
+    }
+
+    keyExists(key) {
+        return !!(await this.get(key, { raw: true }));
+    }
+
+    findKeys(query, options) {
+        let opt = Object.assign(FINDKEYS_OPT, options);
+
+        return (await this.list()).filter(k =>
+        opt.caseSensitive
+            ? k.indexOf(query.toLowerCase()) > -1
+            : k.toLowerCase().indexOf(query.toLowerCase()) > -1
+        );
+    }
 
 
     // Aliases
     clear = this.empty;
     all = this.list;
     del = this.delete;
+    zip = this.zipAll;
+    exists = this.keyExists;
 };
