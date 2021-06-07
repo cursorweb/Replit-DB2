@@ -27,12 +27,14 @@ module.exports = class Client {
         let result, text;
         result = text = await fetch(`${url}/${k}`).then(r => r.text());
 
+        console.log(text);
+
         try {
             if (text == "") result = opt.default; // no content
             else if (!opt.raw) result = JSON.parse(text); // set as json
             // is raw
         } catch {
-            if (opt.error) throw new SyntaxError(
+            if (opt.error) throw new TypeError(
                 `Failed to parse value of ${key}, try setting 'options.raw' to true.`
             );
         }
@@ -52,7 +54,7 @@ module.exports = class Client {
         try {
             // in raw mode, we do not need to do .toString
             // js handles this for us!
-            val = opt.raw ? JSON.stringify(value) : value;
+            val = opt.raw ? value : JSON.stringify(value);
         } catch {
             throw new TypeError(`Failed to set value of ${key}, try setting 'options.raw' to true.`);
         }

@@ -23,7 +23,7 @@ describe("get method", () => {
             await db.get("key");
             expect(false).toEqual(true); // it was supposed to throw error!
         } catch (e) {
-            expect(e).toBeInstanceof(TypeError);
+            expect(e instanceof TypeError).toEqual(true);
         }
     });
 });
