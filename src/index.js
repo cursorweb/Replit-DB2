@@ -15,7 +15,7 @@ module.exports = class Client {
         if (
             (!this._config.url) || // it is most likely local dev (no replit db url)
             process.env.LOCAL_DEV // the user specified
-        ) this._config.isLocal = true;
+        ) this._config._isLocal = true;
     }
 
     async get(key, options = GET_OPT) {
@@ -27,16 +27,14 @@ module.exports = class Client {
         let result, text;
         result = text = await fetch(`${url}/${k}`).then(r => r.text());
 
-        if (!this._config.isLocal) {
-            try {
-                if (text == "") result = opt.default; // no content
-                else if (!opt.raw) result = JSON.parse(text); // set as json
-                // is raw
-            } catch {
-                if (opt.error) throw new SyntaxError(
-                    `Failed to parse value of ${key}, try setting 'options.raw' to true.`
-                );
-            }
+        try {
+            if (text == "") result = opt.default; // no content
+            else if (!opt.raw) result = JSON.parse(text); // set as json
+            // is raw
+        } catch {
+            if (opt.error) throw new SyntaxError(
+                `Failed to parse value of ${key}, try setting 'options.raw' to true.`
+            );
         }
 
         return result;
