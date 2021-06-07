@@ -8,3 +8,6 @@ Many additional features have been added, like `zipAll`, and it is now more conf
 
 ## Local Dev
 Introducing Local Dev. Now you can use this library outside of replit, and all subsequent data will be stored in a JSON file called `database.json`
+
+## Contributions
+Please refer to [contributions.md](CONTRIBUTIONS.md)
