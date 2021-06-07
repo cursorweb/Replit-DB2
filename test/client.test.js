@@ -1,0 +1,1 @@
+// Tests the initialization of the Client.

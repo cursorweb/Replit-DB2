@@ -77,7 +77,7 @@ module.exports = class Client {
 
     async list(prefix = "") {
         const url = this._config.url;
-        const pfix = encodeKey(prefix);
+        const pfix = prefix ? encodeKey(prefix) : prefix; // ensure that prefix was actually specified
         const rawKeys = await fetch(`${url}?prefix=${pfix}`).then(r => r.text());
 
         if (rawKeys == "") return [];
