@@ -27,8 +27,6 @@ module.exports = class Client {
         let result, text;
         result = text = await fetch(`${url}/${k}`).then(r => r.text());
 
-        console.log(text);
-
         try {
             if (text == "") result = opt.default; // no content
             else if (!opt.raw) result = JSON.parse(text); // set as json
@@ -44,7 +42,7 @@ module.exports = class Client {
 
     async set(key, value, options = SET_OPT) {
         let opt = Object.assign(SET_OPT, options);
-        if (opt.overwrite && await this.exists(key)) return;
+        if (!opt.overwrite && await this.exists(key)) return;
 
         const url = this._config.url;
         const k = encodeKey(key);
@@ -56,7 +54,9 @@ module.exports = class Client {
             // js handles this for us!
             val = opt.raw ? value : JSON.stringify(value);
         } catch {
-            throw new TypeError(`Failed to set value of ${key}, try setting 'options.raw' to true.`);
+            throw new TypeError(
+                `Failed to set value of ${key}, try setting 'options.raw' to true.`
+            );
         }
 
         await fetch(url, {
