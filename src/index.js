@@ -161,7 +161,7 @@ module.exports = class Client {
     // Aliases
     clear = this.empty;
     all = this.list;
-    del = this.delete;
+    del = this.deleteMultiple;
     zip = this.zipAll;
     exists = this.keyExists;
 };
