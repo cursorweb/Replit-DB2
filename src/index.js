@@ -18,11 +18,52 @@ module.exports = class Client {
         ) this._config._isLocal = true;
     }
 
+
+    async _localDb(func) {
+        if (!this._config._isLocal) return false;
+
+        // create file
+        const file = this._config.localFile;
+
+        try {
+            await fs.access(file);
+        } catch {
+            await fs.writeFile(file, "");
+        }
+
+        const contents = await fs.readFile(file, "utf-8");
+        try {
+            const json = JSON.parse(contents);
+            const out = func(json);
+            await fs.writeFile(file, JSON.stringify(json));
+            return [out]; // we return an array because it is always truthy
+        } catch {
+            throw new TypeError(`Unable to read '${file}'. Make sure the JSON is valid.`);
+        }
+    }
+
+
     async get(key, options = GET_OPT) {
+        let opt = Object.assign(GET_OPT, options);
+
+
+        let output;
+
+        if (output = await this._localDb(f => {
+            const result = f[key];
+            if (opt.raw) return result || opt.default;
+            else {
+                try {
+                    return result === undefined ? JSON.parse(result) : opt.default;
+                } catch {
+                    if (opt.error) throw new TypeError(`Failed to parse value of ${key}, try setting 'options.raw' to true.`);
+                }
+            }
+        })) return output[0];
+
+
         const url = this._config.url;
         const k = encodeKey(key);
-
-        let opt = Object.assign(GET_OPT, options);
 
         let result, text;
         result = text = await fetch(`${url}/${k}`).then(r => r.text());
@@ -41,6 +82,17 @@ module.exports = class Client {
     }
 
     async set(key, value, options = SET_OPT) {
+        if (value == "") throw new TypeError("The 'value' argument cannot be empty!");
+
+        if (await this._localDb(f => {
+            try {
+                if (!opt.overwrite && await this.exists(key)) return;
+                f[key] = opt.raw ? value : JSON.stringify(value);
+            } catch {
+                throw new TypeError(`Failed to set value of '${key}', try setting 'options.raw' to 'true'.`);
+            }
+        })) return;
+
         let opt = Object.assign(SET_OPT, options);
         if (!opt.overwrite && await this.exists(key)) return;
 
@@ -55,7 +107,7 @@ module.exports = class Client {
             val = opt.raw ? value : JSON.stringify(value);
         } catch {
             throw new TypeError(
-                `Failed to set value of ${key}, try setting 'options.raw' to true.`
+                `Failed to set value of '${key}', try setting 'options.raw' to 'true'.`
             );
         }
 
@@ -69,6 +121,10 @@ module.exports = class Client {
     }
 
     async delete(key) {
+        if (await this._localDb(f => {
+            if (f[key]) delete f[key];
+        })) return;
+
         const url = this._config.url;
         const k = encodeKey(key);
 
@@ -76,6 +132,11 @@ module.exports = class Client {
     }
 
     async list(prefix = "") {
+        let output;
+        if (output = await this._localDb(f => {
+            return Object.keys(f).filter(o => o.startsWith(prefix));
+        })) output[0];
+
         const url = this._config.url;
         const pfix = prefix ? encodeKey(prefix) : prefix; // ensure that prefix was actually specified
         const rawKeys = await fetch(`${url}?prefix=${pfix}`).then(r => r.text());
