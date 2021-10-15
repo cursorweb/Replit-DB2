@@ -75,7 +75,7 @@ describe("list method", () => {
 });
 
 describe("empty method", () => {
-    test("empty db", () => {
+    test("empty db", async () => {
         await db.set("key", "value");
         await db.set("key2", "value2");
         await db.set("key3", "value3");
@@ -86,7 +86,7 @@ describe("empty method", () => {
 });
 
 describe("getall method", () => {
-    test("get as object", () => {
+    test("get as object", async () => {
         await db.set("key", "value");
         await db.set("key2", "value2");
         await db.set("key3", "value3");
@@ -100,7 +100,7 @@ describe("getall method", () => {
 });
 
 describe("setall method", () => {
-    test("setall db", () => {
+    test("setall db", async () => {
         expect(await db.setAll({
             key: "value",
             key2: "value",
@@ -108,7 +108,7 @@ describe("setall method", () => {
         })).toBeUndefined();
     });
 
-    test("setall invalid json", () => {
+    test("setall invalid json", async () => {
         try {
             await db.setAll({
                 key: new BigInt(69),
@@ -122,7 +122,7 @@ describe("setall method", () => {
 });
 
 describe("deletemultiple method", () => {
-    test("delete multiple keys from db", () => {
+    test("delete multiple keys from db", async () => {
         await db.set("key", "value");
         await db.set("key2", "value2");
         await db.set("key3", "value3");
@@ -134,7 +134,7 @@ describe("deletemultiple method", () => {
 });
 
 describe("zipall method", () => {
-    test("zipall keys", () => {
+    test("zipall keys", async () => {
         await db.set("key", "value");
         await db.set("key2", "value2");
         await db.set("key3", "value3");
@@ -148,7 +148,7 @@ describe("zipall method", () => {
 });
 
 describe("exists method", () => {
-    test("key exists db", () => {
+    test("key exists db", async () => {
         await db.set("key", "value");
 
         expect(await db.keyExists("key")).toEqual(true);
@@ -157,7 +157,7 @@ describe("exists method", () => {
 });
 
 describe("findkeys method", () => {
-    test("find keys db", () => {
+    test("find keys db", async () => {
         await db.set("key", "value");
         await db.set("key2", "value2");
         await db.set("key22", "value2");
@@ -166,7 +166,7 @@ describe("findkeys method", () => {
         expect(await db.findKeys("2")).toEqual(["key2", "key22"]);
     });
 
-    test("find keys insensitive", () => {
+    test("find keys insensitive", async () => {
         await db.set("Key", "value");
         await db.set("key2", "value2");
         await db.set("value3", "key3");

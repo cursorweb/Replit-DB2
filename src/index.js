@@ -2,7 +2,7 @@ require("dotenv").config();
 const fs = require("fs").promises;
 const fetch = require("node-fetch");
 
-const { CONST_OPT, GET_OPT, SET_OPT, GETALL_OPT, SETALL_OPT, FINDKEYS_OPT } = require("./constants");
+const { CONST_OPT, GET_OPT, SET_OPT, GETALL_OPT, FINDKEYS_OPT } = require("./constants");
 const { encodeKey, decodeKey } = require("./util");
 
 
@@ -28,16 +28,16 @@ module.exports = class Client {
         try {
             await fs.access(file);
         } catch {
-            await fs.writeFile(file, "");
+            await fs.writeFile(file, "{}");
         }
 
         const contents = await fs.readFile(file, "utf-8");
         try {
             const json = JSON.parse(contents);
-            const out = func(json);
+            const out = await func(json);
             await fs.writeFile(file, JSON.stringify(json));
             return [out]; // we return an array because it is always truthy
-        } catch {
+        } catch (e) {
             throw new TypeError(`Unable to read '${file}'. Make sure the JSON is valid.`);
         }
     }
@@ -49,7 +49,7 @@ module.exports = class Client {
 
         let output;
 
-        if (output = await this._localDb(f => {
+        if (output = await this._localDb(async f => {
             const result = f[key];
             if (opt.raw) return result || opt.default;
             else {
@@ -83,17 +83,17 @@ module.exports = class Client {
 
     async set(key, value, options = SET_OPT) {
         if (value == "") throw new TypeError("The 'value' argument cannot be empty!");
+        let opt = Object.assign(SET_OPT, options);
 
-        if (await this._localDb(f => {
+        if (await this._localDb(async f => {
             try {
                 if (!opt.overwrite && await this.exists(key)) return;
                 f[key] = opt.raw ? value : JSON.stringify(value);
-            } catch {
+            } catch (e) {
                 throw new TypeError(`Failed to set value of '${key}', try setting 'options.raw' to 'true'.`);
             }
         })) return;
-
-        let opt = Object.assign(SET_OPT, options);
+        
         if (!opt.overwrite && await this.exists(key)) return;
 
         const url = this._config.url;
@@ -135,7 +135,7 @@ module.exports = class Client {
         let output;
         if (output = await this._localDb(f => {
             return Object.keys(f).filter(o => o.startsWith(prefix));
-        })) output[0];
+        })) return output[0];
 
         const url = this._config.url;
         const pfix = prefix ? encodeKey(prefix) : prefix; // ensure that prefix was actually specified
@@ -147,6 +147,10 @@ module.exports = class Client {
 
 
     async empty(prefix = "") {
+        if (this._config._isLocal && !prefix) {
+            const file = this._config.localFile;
+            return await fs.writeFile(file, "{}");
+        }
         // promise.all offers more speed
         let promises = [];
 
